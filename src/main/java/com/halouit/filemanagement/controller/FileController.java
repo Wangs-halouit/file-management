@@ -39,4 +39,11 @@ public class FileController {
     public ResponseEntity<byte[]> getImage(@PathVariable String id) throws IOException {
         return fileManagementService.getTempImage(id);
     }
+
+    @GetMapping("/temp/rabbit/{id}")
+    public FileSystemResource findFileByTempId(@PathVariable String id, HttpServletResponse response) {
+        FileSystemResource file = fileManagementService.findFileByTempId(id);
+        response.setHeader("Content-Disposition", "attachment; filename=" + file.getFilename());
+        return file;
+    }
 }

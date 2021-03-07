@@ -6,4 +6,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface FileInfoRepository extends JpaRepository<FileInfo,Long> {
+    FileInfo findFileInfoByTempPath(String pathId);
 }

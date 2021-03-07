@@ -38,6 +38,8 @@ public class FileManagementService {
     @Autowired
     private FileRedisService fileRedisService;
 
+    @Autowired
+    private TempPathInvalidSendService  sendService;
 
     public FileInfoDTO upload(MultipartFile file) {
         if (file.isEmpty()) {
@@ -78,6 +80,11 @@ public class FileManagementService {
         FileTempInfoDTO result = new FileTempInfoDTO();
         result.setId(uuid);
 
+        FileInfo fileInfo = fileInfoRepository.findById(id).orElseThrow(() -> new RuntimeException("文件不存在"));
+        fileInfo.setTempPath(uuid);
+        fileInfoRepository.save(fileInfo);
+        sendService.send(id);
+
         return result;
     }
 
@@ -93,6 +100,20 @@ public class FileManagementService {
         String path = fileInfo.getPath();
         return Paths.get(fileConfig.getPath(), path);
     }
+
+
+
+    //rabbit
+    public FileSystemResource findFileByTempId(String id) {
+        FileInfo fileInfo = fileInfoRepository.findFileInfoByTempPath(id);
+        if(fileInfo == null){
+            throw new RuntimeException("文件不存在");
+        }
+        String path = fileInfo.getPath();
+        Path absolutePath = Paths.get(fileConfig.getPath(), path);
+        return new FileSystemResource(new File(absolutePath.toString()));
+    }
+
 
     public ResponseEntity<byte[]> getTempImage(String id) throws IOException {
         Path absolutePath = getPathByTempId(id);

@@ -39,4 +39,9 @@ public class FileInfo {
      */
     @Column(columnDefinition = "json")
     private String meta;
+    /**
+     * rabbitmq保存临时路径
+     */
+    @Column
+    private String tempPath;
 }
